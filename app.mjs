@@ -24,7 +24,7 @@ const prefix = '/api';
 const port = process.env.PORT || 80;
 
 app.use(`${prefix}/auth`, authRouter);
-app.use(`${prefix}/users`, requireAuth, usersRouter);
-app.use(`${prefix}/trains`, requireAuth, trainsRouter);
+app.use(`${prefix}/users`, /*requireAuth,*/ usersRouter);
+app.use(`${prefix}/trains`, /*requireAuth,*/ trainsRouter);
 
 app.listen(port, () => { console.log(`running :${port}`)});
