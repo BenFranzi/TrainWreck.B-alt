@@ -27,6 +27,13 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/create',
+[
+    check('number_carriages').exists(),
+    check('route_id').exists(),
+    check('weather').exists(),
+    check('headlights').exists(),
+    check('youtubeId').exists(),
+], 
 async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -43,7 +50,6 @@ async (req, res) => {
         const train = await TrainsService.createTrain(req.body.number_carriages, req.body.route_id, req.body.weather, req.body.headlights, req.body.youtubeId, (err, train) => {
             if (err) {
                 console.log('failed to save train', err)
-                throw new Error('Failed to save train to the database', err);
             }
             return res.send({id: train.id});
         });
