@@ -42,3 +42,21 @@ export const setPassword = (password, user) => {
         }
     });
 }
+
+export const setName = (name, user) => {
+    user.name = name;
+    user.save(err => {
+        if (err) {
+            throw new Error('Failed to save user name to the database', err);
+        }
+    });
+}
+
+export const setRole = (role, user) => {
+    user.role = role;
+    user.save(err => {
+        if (err) {
+            throw new Error('Failed to save user role to the database', err);
+        }
+    });
+}
