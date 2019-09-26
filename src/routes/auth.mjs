@@ -11,6 +11,25 @@ router.get('/check', async (req, res) => {
 });
 
 
+
+ 
+router.post('/refresh', requireAuth,
+async (req, res) => {
+    // If you have reached this point, the middleware has worked and you are authorised
+    const token = AuthService.makeTokenWithEmail(req.user.email, (token) => {
+        if (!token) {
+            return res.status(401).send({
+                error: 'token could not be generated'
+            });
+        } else {
+            return res.status(200).send({
+                message: 'success', 
+                token: token
+            });
+        }
+    });   
+});
+
 router.post('/', 
 [
     check('email').isEmail(),
@@ -20,13 +39,13 @@ async (req, res) => {
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(200).send({
+        return res.status(400).send({
             error: 'invalid username or password',
         });
     }    
     await AuthService.isAuthorised(req.body.email, req.body.password, async (isAuthorised) => {
         if (!isAuthorised) {
-            return res.status(200).send({
+            return res.status(400).send({
                 error: 'incorrect credentials',
             });
         } else {
@@ -46,23 +65,6 @@ async (req, res) => {
     }); 
 });
 
- 
-router.post('/refresh', requireAuth,
-async (req, res) => {
-    // If you have reached this point, the middleware has worked and you are authorised
-    const token = AuthService.makeTokenWithEmail(req.user.email, (token) => {
-        if (!token) {
-            return res.status(401).send({
-                error: 'token could not be generated'
-            });
-        } else {
-            return res.status(200).send({
-                message: 'success', 
-                token: token
-            });
-        }
-    });   
-});
 
 
 export default router;

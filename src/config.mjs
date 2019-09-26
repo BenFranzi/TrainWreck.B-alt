@@ -8,11 +8,34 @@ const DBConfig = {
 }
 
 const WSConfig = {
-    http: 'http://localhost',
-    path: '/yo',
+    PATH: '/ws',
+    PORT: 81
+}
+
+const TrainStates = {
+    "STOP": "STOP",
+    "CONTINUE": "CONTINUE",
+    "ACCEL": "ACCEL",
+    "DECEL": "DECEL"
+}
+
+const MLObjects = {
+    "People": "People",
+    "Platform": "Platform",
+    "RR": "RR",
+    "GG": "GG",
+    "YY": "YY",
+    "RG": "RG",   
+    "RY": "RY",   
+    "GY": "GY",   
+    "SpeedSign": "SpeedSign",   
+    "SpeedRegulator": "SpeedRegulator"   
 }
 
 export default {
     JWT: JWTConfig,
-    DB: DBConfig
+    DB: DBConfig,
+    WS: WSConfig,
+    MLObjects: MLObjects,
+    TrainStates: TrainStates
 }
