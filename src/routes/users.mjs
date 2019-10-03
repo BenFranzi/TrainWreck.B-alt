@@ -5,7 +5,6 @@ const { param, check, validationResult } = checkAPIs;
 
 import * as UsersService from '../services/users.mjs';
 
-
 const router = express.Router();
 
 router.get('/',
@@ -69,6 +68,7 @@ async (req, res) => {
 router.put('/password/:id',
 [
     check('password').isLength({min: 8}),
+    param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
     const errors = validationResult(req);
@@ -96,8 +96,11 @@ async (req, res) => {
     }
 });
 
-router.put('/role/:id', async (req, res) => {
-
+router.put('/role/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
+async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({
@@ -124,6 +127,9 @@ router.put('/role/:id', async (req, res) => {
 });
 
 router.put('/name/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
 async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -151,6 +157,9 @@ async (req, res) => {
 });
 
 router.delete('/remove/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
 async (req, res) => {
     const user = await UsersService.getUser(req.params.id, (err, user) => {
         if (!!err) {
@@ -165,7 +174,9 @@ async (req, res) => {
 });
 
 router.get('/:id',
-    // param(':id').isLength({min: 24, max: 24}),
+[
+    param('id').isLength({min: 24, max: 24}),
+],
 async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

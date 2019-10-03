@@ -29,7 +29,7 @@ mongoose.connect(
   .catch(err => console.log(err));
 
 const prefix = '/api';
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 
 app.use(`${prefix}/auth`, authRouter);
 app.use(`${prefix}/users`, requireAuth, usersRouter);

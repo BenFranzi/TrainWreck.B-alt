@@ -10,9 +10,6 @@ router.get('/check', async (req, res) => {
     return res.send({error: 'Use POST'});
 });
 
-
-
- 
 router.post('/refresh', requireAuth,
 async (req, res) => {
     // If you have reached this point, the middleware has worked and you are authorised
@@ -30,7 +27,7 @@ async (req, res) => {
     });   
 });
 
-router.post('/', 
+router.post('/login', 
 [
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
@@ -64,7 +61,5 @@ async (req, res) => {
         }
     }); 
 });
-
-
 
 export default router;

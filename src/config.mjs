@@ -9,7 +9,7 @@ const DBConfig = {
 
 const WSConfig = {
     PATH: '/ws',
-    PORT: 81
+    PORT: 8081
 }
 
 const TrainStates = {

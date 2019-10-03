@@ -1,7 +1,7 @@
 import express from 'express';
 import * as TrainsService from '../services/trains.mjs';
 import checkAPIs from 'express-validator';
-const { check, validationResult } = checkAPIs;
+const { check, param, validationResult } = checkAPIs;
 
 const router = express.Router();
 
@@ -33,6 +33,8 @@ router.post('/create',
     check('weather').exists(),
     check('headlights').exists(),
     check('youtubeId').exists(),
+    check('train_name').exists(),
+    check('route_name').exists()
 ], 
 async (req, res) => {
     const errors = validationResult(req);
@@ -47,7 +49,7 @@ async (req, res) => {
         });
     }
     try {
-        const train = await TrainsService.createTrain(req.body.number_carriages, req.body.route_id, req.body.weather, req.body.headlights, req.body.youtubeId, (err, train) => {
+        const train = await TrainsService.createTrain(req.body.number_carriages, req.body.route_id, req.body.weather, req.body.headlights, req.body.youtubeId, req.body.train_name, req.body.route_name,(err, train) => {
             if (err) {
                 console.log('failed to save train', err)
             }
@@ -62,7 +64,8 @@ async (req, res) => {
     
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id',
+async (req, res) => {
     const trains = await TrainsService.getTrain(req.params.id, (err, train) => {
         if (!!err) {
             return res.status(500).json({
@@ -72,7 +75,5 @@ router.get('/:id', async (req, res) => {
         res.json(train);
     });
 });
-
-//id, number_carriages, route_id, weather, headlights, youtubeId
 
 export default router;

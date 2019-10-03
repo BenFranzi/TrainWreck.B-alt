@@ -1,7 +1,7 @@
 import {spawn} from 'child_process'
 import {default as trainLogic} from './trainState.mjs' 
 
-const ML_PATH = '/Users/benfranzi/Projects/STB/TrainWreck.B-alt/src/ml/ml.py'
+const ML_PATH = '/Users/benfranzi/Projects/old_projects/STB/TrainWreck.B-alt/src/ml/ml.py'
 
 export default (youtubeUrl, stdout) => {
 
