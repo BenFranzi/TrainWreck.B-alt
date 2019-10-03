@@ -5,7 +5,6 @@ const { param, check, validationResult } = checkAPIs;
 
 import * as UsersService from '../services/users.mjs';
 
-
 const router = express.Router();
 
 router.get('/',
@@ -23,44 +22,9 @@ async (req, res) => {
     });
 });
 
-router.get('/:id',
-    // param(':id').isLength({min: 24, max: 24}),
-async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({
-            error: errors.errors.map(err => {
-                return {
-                    msg: err.msg,
-                    param: err.param,
-                };
-            }),
-        });
-    }
-    try {
-        UsersService.getUser(req.params.id, async (err, user) => {
-            if (!user) {
-                res.status(400).json({
-                    error: `User does not exist ${e}`,
-                });
-            }
-            return res.send({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            });
-        });
-    } catch (e) {
-        return res.status(500).json({
-            error: `Could not get user ${e}`,
-        });
-    }
-});
-
 router.get('/me',
 async (req, res) => {
-    return res.send({message: 'success'});
+    return res.status(200).json(req.user);
 });
 
 router.post('/create',
@@ -104,6 +68,7 @@ async (req, res) => {
 router.put('/password/:id',
 [
     check('password').isLength({min: 8}),
+    param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
     const errors = validationResult(req);
@@ -115,33 +80,86 @@ async (req, res) => {
         });
     }
     try {
-        UsersService.getUser(req.body._id, async (err, user) => {
+        UsersService.getUser(req.params.id, async (err, user) => {
             if (!user) {
                 return res.status(400).json({
                     error: `User does not exist`,
                 });
             }
             await UsersService.setPassword(req.body.password, user);
-            return  res.sent({msg: 'success'});
+            return  res.send({msg: 'success'});
         });    
     } catch (e) {
         return res.status(500).json({
             error: `Failed to set password: ${e}`,
         });
     }
-    return res.send({message: 'success'});
 });
 
-router.put('/role/:id', async (req, res) => {
-    return res.send({message: 'success'});
+router.put('/role/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
+async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.errors.map(err => {
+                return { msg: err.msg };
+            })
+        });
+    }
+    try {
+        UsersService.getUser(req.params.id, async (err, user) => {
+            if (!user) {
+                return res.status(400).json({
+                    error: `User does not exist`,
+                });
+            }
+            await UsersService.setRole(req.body.role, user);
+            return  res.send({msg: 'success'});
+        });    
+    } catch (e) {
+        return res.status(500).json({
+            error: `Failed to set role: ${e}`,
+        });
+    }
 });
 
 router.put('/name/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
 async (req, res) => {
-    return res.send({message: 'success'});
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.errors.map(err => {
+                return { msg: err.msg };
+            })
+        });
+    }
+    try {
+        UsersService.getUser(req.params.id, async (err, user) => {
+            if (!user) {
+                return res.status(400).json({
+                    error: `User does not exist`,
+                });
+            }
+            await UsersService.setName(req.body.name, user);
+            return  res.send({msg: 'success'});
+        });    
+    } catch (e) {
+        return res.status(500).json({
+            error: `Failed to set name: ${e}`,
+        });
+    }
 });
 
 router.delete('/remove/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
 async (req, res) => {
     const user = await UsersService.getUser(req.params.id, (err, user) => {
         if (!!err) {
@@ -153,6 +171,43 @@ async (req, res) => {
     });
     
     return res.send({message: 'Deleted User'});
+});
+
+router.get('/:id',
+[
+    param('id').isLength({min: 24, max: 24}),
+],
+async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.errors.map(err => {
+                return {
+                    msg: err.msg,
+                    param: err.param,
+                };
+            }),
+        });
+    }
+    try {
+        UsersService.getUser(req.params.id, async (err, user) => {
+            if (!user) {
+                res.status(400).json({
+                    error: `User does not exist ${err}`,
+                });
+            }
+            return res.send({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            });
+        });
+    } catch (e) {
+        return res.status(500).json({
+            error: `Could not get user ${e}`,
+        });
+    }
 });
 
 export default router;
