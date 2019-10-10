@@ -18,17 +18,18 @@ objects = ["People","Platform","RR","GG","YY","RG","RY","GY","SpeedSign","SpeedR
 numObjects = 9
 
 
-epochTime = round(uniform(0.0, 999.99), 2)
+epochTime = 0 #round(uniform(0.0, 999.99), 2)
 
 lastValue = True
 
 while lastValue == True:
     randNum = randint(0,numObjects)
-    outp = "{\"detected\": \"" + objects[randNum] + "\", \"epoch\": " + str(epochTime) + "}"
-    print (outp)
-    
+    if int(epochTime) % 120 < 10:
+        print("{\"detected\": \"" + objects[randint(0,numObjects)] + "\", \"epoch\": " + str(epochTime) + "}")
+    else:
+        print("{\"detected\": \"" + objects[randint(0,numObjects)] + "\", \"epoch\": " + str(epochTime) + "}")
+        
+    timeNum = randint(1, 10)
+    time.sleep(timeNum / 10)
 
-    timeNum = randint(1, 3)
-    time.sleep(timeNum)
-
-    epochTime = epochTime + timeNum
+    epochTime = epochTime + timeNum/100.0
