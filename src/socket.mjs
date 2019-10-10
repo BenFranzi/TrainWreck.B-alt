@@ -100,7 +100,7 @@ export const socket = (io) => {
             const outp = {
                 data: Array.from(detectedInEpoch), 
                 epoch: epoch, 
-                // url: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
+                url: 'http://trains.benfranzi.com:8080/media/train-test.jpg',
                 logic: determineState(),
             } 
 

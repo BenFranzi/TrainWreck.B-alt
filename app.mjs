@@ -10,7 +10,9 @@ import {default as trainsRouter} from './src/routes/trains.mjs';
 import {default as config} from './src/config.mjs';
 import {socket} from './src/socket.mjs'
 import requireAuth from './src/middleware/requireAuth.mjs';
- 
+import path from 'path';
+import variables from './src/logic/cjs.js';
+const {__dirname} = variables;
 
 /**
  * Setup express middleware
@@ -51,6 +53,8 @@ app.use(`${prefix}/auth`, authRouter);
 app.use(`${prefix}/users`, requireAuth, usersRouter);
 // serving trainsRouter under /api/trains
 app.use(`${prefix}/trains`, requireAuth, trainsRouter);
+
+app.use('/media', express.static(path.resolve(__dirname, '../../media')));
 
 /**
  * Setup socket connection
