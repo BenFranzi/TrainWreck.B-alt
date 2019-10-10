@@ -1,25 +1,35 @@
 import express from 'express';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
-
+import cors from 'cors';
+import socketio from "socket.io";
+import * as http from 'http';
 import {default as authRouter} from './src/routes/auth.mjs';
 import {default as usersRouter} from './src/routes/users.mjs';
 import {default as trainsRouter} from './src/routes/trains.mjs';
-import requireAuth from './src/middleware/requireAuth.mjs';
 import {default as config} from './src/config.mjs';
-import cors from 'cors';
-
 import {socket} from './src/socket.mjs'
-import socketio from "socket.io";
-import * as http from 'http';
-
+import requireAuth from './src/middleware/requireAuth.mjs';
  
 
+/**
+ * Setup express middleware
+ */
+
+// Get app from express
 const app = express();
+// Morgan is used to log requests to server
 app.use(morgan('dev'));
+// Express app is expecting JSON 
 app.use(express.json());
+// Allow cross origin resource sharing
 app.use(cors());
+// Use middleware to parse urlencoded bodies (only querystring library) https://expressjs.com/en/api.html
 app.use(express.urlencoded({ extended: false }));
+
+/**
+ * Connect to database
+ */
 
 mongoose.connect(
     config.DB.URL,
@@ -28,37 +38,37 @@ mongoose.connect(
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
+/**
+ * Define routes
+ */
+
 const prefix = '/api';
 const port = process.env.PORT || 8080;
 
+// serving authRouter under /api/auth
 app.use(`${prefix}/auth`, authRouter);
+// serving usersRouter under /api/users
 app.use(`${prefix}/users`, requireAuth, usersRouter);
+// serving trainsRouter under /api/trains
 app.use(`${prefix}/trains`, requireAuth, trainsRouter);
 
-// Socket Setup
+/**
+ * Setup socket connection
+ */
+
+// Configure separate server for socket serving
 const httpVar = http.Server(app);
+// Create new socketio instance
 const io = socketio(httpVar, {path: config.WS.PATH});
+// Pass socket server instance to 'socket' class
 socket(io);
+
+/**
+ * Serve
+ */
+
+// Serve socket
 httpVar.listen(config.WS.PORT);
 
+// Serve REST endpoints
 app.listen(port, () => { console.log(`running :${port}`)});
-
-
-
-
-
-
-
-/*
-
-
-var io = require('socket.io')(http, {
-    path: '/ws',
-    //example stuff
-    serveClient: true,
-    // below are engine.IO options
-    pingInterval: 10000,
-    pingTimeout: 5000,
-    cookie: false
-    //end example stuff
-});*/

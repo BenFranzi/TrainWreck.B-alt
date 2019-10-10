@@ -2,11 +2,20 @@ import express from 'express';
 import checkAPIs from 'express-validator';
 import {default as Users} from '../models/users.mjs';
 const { param, check, validationResult } = checkAPIs;
-
 import * as UsersService from '../services/users.mjs';
+
+/**
+ * Users Route
+ * Handles all user requests
+ * Requires authentication to access
+ */
 
 const router = express.Router();
 
+/**
+ * Get Users
+ * Returns list of all users
+ */
 router.get('/',
 async (req, res) => {
     const users = await UsersService.getUsers((err, users) => {
@@ -15,6 +24,8 @@ async (req, res) => {
                 error: `Failed to create user: ${e}`,
             });
         }
+
+        // If get users was successful, return list
         res.json({
             users: users,
             count: users.length
@@ -22,11 +33,19 @@ async (req, res) => {
     });
 });
 
+/**
+ * Get Me
+ * Get my own details
+ */
 router.get('/me',
 async (req, res) => {
     return res.status(200).json(req.user);
 });
 
+/**
+ * Create User
+ * Creates a new user
+ */
 router.post('/create',
 [
     check('name').exists(),
@@ -35,6 +54,8 @@ router.post('/create',
     check('role').custom(role => UsersService.checkRole(role)),
 ],
 async (req, res) => {
+
+    // Verify sent fields are valid
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({
@@ -47,8 +68,10 @@ async (req, res) => {
         });
     }
     try {
+        // Check if the email address already exists
         UsersService.getUserByEmail(req.body.email, async (err, existingUser) => {
             if (!existingUser) {
+                // If the user does not already exist, create a new user
                 const user = await UsersService.createUser(req.body.name, req.body.email, req.body.password, req.body.role);
                 return res.send({id: user.id});
             }
@@ -56,7 +79,6 @@ async (req, res) => {
                 error: `User already exists`,
             });
         })
-        
     } catch (e) {
         return res.status(500).json({
             error: `Failed to create user: ${e}`,
@@ -65,12 +87,18 @@ async (req, res) => {
     
 });
 
+/**
+ * Update users password
+ * Used to change the users password
+ */
 router.put('/password/:id',
 [
     check('password').isLength({min: 8}),
     param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
+
+    // Verify sent fields are valid
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({
@@ -86,6 +114,8 @@ async (req, res) => {
                     error: `User does not exist`,
                 });
             }
+
+            // Update password
             await UsersService.setPassword(req.body.password, user);
             return  res.send({msg: 'success'});
         });    
@@ -96,11 +126,16 @@ async (req, res) => {
     }
 });
 
+/**
+ * Update users role
+ * Used to update users role
+ */
 router.put('/role/:id',
 [
     param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
+    // Verify sent fields are valid
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({
@@ -116,6 +151,8 @@ async (req, res) => {
                     error: `User does not exist`,
                 });
             }
+
+            // If user is found and is authorised, update user role
             await UsersService.setRole(req.body.role, user);
             return  res.send({msg: 'success'});
         });    
@@ -126,11 +163,17 @@ async (req, res) => {
     }
 });
 
+/**
+ * Update the users name
+ * Used to update the users name
+ */
 router.put('/name/:id',
 [
     param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
+
+    // Verify sent fields are valid
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({
@@ -139,6 +182,7 @@ async (req, res) => {
             })
         });
     }
+
     try {
         UsersService.getUser(req.params.id, async (err, user) => {
             if (!user) {
@@ -146,6 +190,7 @@ async (req, res) => {
                     error: `User does not exist`,
                 });
             }
+            // If user is found and is authorised, update user name
             await UsersService.setName(req.body.name, user);
             return  res.send({msg: 'success'});
         });    
@@ -156,28 +201,50 @@ async (req, res) => {
     }
 });
 
+/**
+ * Delete user
+ * Used to delete a user
+ */
 router.delete('/remove/:id',
 [
     param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
+
+    // Verify sent fields are valid
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.errors.map(err => {
+                return { msg: err.msg };
+            })
+        });
+    }
+    
     const user = await UsersService.getUser(req.params.id, (err, user) => {
         if (!!err) {
             return res.status(404).json({
                 error: `User not found`,
             });
         }
+
+        // If the user is found, delete it
         user.remove();
+        return res.send({message: 'Deleted User'});
     });
-    
-    return res.send({message: 'Deleted User'});
 });
 
+/**
+ * Get user
+ * Get a users detail by its id
+ */
 router.get('/:id',
 [
     param('id').isLength({min: 24, max: 24}),
 ],
 async (req, res) => {
+
+    // Verify sent fields are valid
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({
@@ -189,7 +256,9 @@ async (req, res) => {
             }),
         });
     }
+
     try {
+        // Get the user by the id
         UsersService.getUser(req.params.id, async (err, user) => {
             if (!user) {
                 res.status(400).json({

@@ -1,9 +1,12 @@
+//NOTE: Doesn't check if the user already exists
 import mongoose from 'mongoose';
 import { default as User } from './src/models/users.mjs';
 import {default as config} from './src/config.mjs';
 import { UserRole } from './src/models/users.mjs';
 
-//NOTE: Doesn't check if the user already exists
+/**
+ * Create a single user in the database
+ */
 mongoose.connect(
     config.DB.URL,
     { useNewUrlParser: true }
